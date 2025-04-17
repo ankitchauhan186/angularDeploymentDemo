@@ -19,7 +19,7 @@ steps:
 # Replace 'your-project-name' with the actual name inside the 'projects' in angular.json
 - task: CopyFiles@2
   inputs:
-    Contents: 'dist/angularDeploymentDemo/**'
+    Contents: 'dist/devopsDemo/**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
   displayName: 'Copy built Angular app to staging directory'
 
