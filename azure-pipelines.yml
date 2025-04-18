@@ -16,24 +16,34 @@ steps:
     ng build --configuration production
   displayName: 'Install dependencies and build Angular app'
 
-# Replace 'your-project-name' with the actual name inside the 'projects' in angular.json
 - task: CopyFiles@2
   inputs:
     Contents: 'dist/devops-demo/**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/angular-app'
   displayName: 'Copy built Angular app to staging directory'
 
+# Zip the output
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/angular-app'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/angular-app/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+  displayName: 'Zip Angular app for deployment'
+
+# Publish zip artifact
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/angular-app'
     ArtifactName: 'angular-app'
     publishLocation: 'Container'
   displayName: 'Publish build artifacts'
 
-# Deploy the build artifact to Azure Web App
+# Deploy zip to Azure Web App
 - task: AzureWebApp@1
   inputs:
-    azureSubscription: 'Azure subscription 1 (2b0fc391-9b97-4f81-927f-718122a18912)'  # Replace with your actual service connection name
-    appName: 'azureDemoAnkit'  # Replace with your actual Azure app name
-    package: '$(Build.ArtifactStagingDirectory)/angular-app/$(Build.BuildId).zip'  # Ensure this path is correct
+    azureSubscription: 'Azure subscription 1 (2b0fc391-9b97-4f81-927f-718122a18912)'
+    appName: 'azureDemoAnkit'
+    package: '$(Build.ArtifactStagingDirectory)/angular-app/$(Build.BuildId).zip'
   displayName: 'Deploy to Azure Web App'
