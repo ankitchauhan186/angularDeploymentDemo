@@ -35,5 +35,5 @@ steps:
   inputs:
     azureSubscription: 'Azure subscription 1 (2b0fc391-9b97-4f81-927f-718122a18912)'  # Replace with your actual service connection name
     appName: 'azureDemoAnkit'  # Replace with your actual Azure app name
-    package: '$(Build.ArtifactStagingDirectory)/angular-app/package.zip'  # Ensure this path is correct
+    package: '$(Build.ArtifactStagingDirectory)/angular-app/$(Build.BuildId).zip'  # Ensure this path is correct
   displayName: 'Deploy to Azure Web App'
