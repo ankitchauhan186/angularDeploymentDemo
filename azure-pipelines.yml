@@ -5,24 +5,27 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+# Install Node.js
 - task: NodeTool@0
   inputs:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
 
+# Install Angular CLI and project dependencies, then build the app
 - script: |
     npm install -g @angular/cli
     npm install
     ng build --configuration production
   displayName: 'Install dependencies and build Angular app'
 
+# Copy only the 'browser' folder contents to staging directory
 - task: CopyFiles@2
   inputs:
-    Contents: 'dist/devops-demo/**'
+    Contents: 'dist/devops-demo/browser/**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/angular-app'
-  displayName: 'Copy built Angular app to staging directory'
+  displayName: 'Copy Angular browser build to staging directory'
 
-# Zip the output
+# Zip the browser folder contents
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/angular-app'
@@ -32,7 +35,7 @@ steps:
     replaceExistingArchive: true
   displayName: 'Zip Angular app for deployment'
 
-# Publish zip artifact
+# Publish the zipped artifact
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/angular-app'
@@ -40,10 +43,10 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish build artifacts'
 
-# Deploy zip to Azure Web App
+# Deploy the zipped artifact to Azure Web App
 - task: AzureWebApp@1
   inputs:
-    azureSubscription: 'Azure subscription 1 (2b0fc391-9b97-4f81-927f-718122a18912)'
-    appName: 'azureDemoAnkit'
+    azureSubscription: 'Azure subscription 1 (2b0fc391-9b97-4f81-927f-718122a18912)'  # Replace with your actual Azure connection name
+    appName: 'azureDemoAnkit'  # Replace with your actual App Service name
     package: '$(Build.ArtifactStagingDirectory)/angular-app/$(Build.BuildId).zip'
   displayName: 'Deploy to Azure Web App'
